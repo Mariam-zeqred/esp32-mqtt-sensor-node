@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <esp_sleep.h>
+#include <esp_system.h>  // esp_random
 
 #include "Backoff.h"
 #include "Config.h"
