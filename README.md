@@ -82,8 +82,10 @@ sent by the broker as the last will when the keepalive (30 s) lapses without a c
 - **No heap, no JSON library.** `telemetry_to_json` writes with `snprintf` into a fixed buffer and
   returns 0 if the document would not fit; the node never publishes a truncated document.
 - **TLS needs a clock.** Certificate validity is checked against the system time, so NTP runs
-  before the first MQTT connect. If NTP is slow the node still connects with `ts:null` and
-  retries the sync each loop.
+  before the first MQTT connect. If NTP has not synced within 10 s the node tries to connect
+  anyway and publishes `ts:null`; whether mbedTLS accepts the certificate while the clock still
+  reads 1970 is untested on hardware (it may reject it as "not yet valid" until SNTP, which
+  keeps running in the background, sets the time).
 - **Deep sleep option.** `DEEP_SLEEP_ENABLED 1` in `Config.h`: one reading per wake, `seq` kept
   in RTC memory, radio off between readings. If it cannot connect within about 75 s it sleeps
   anyway instead of draining the battery.
@@ -120,7 +122,9 @@ tests/                    pytest for the subscriber
 
 ## Limitations
 
-- Compiles in CI, not yet run on hardware.
+- Compiles in CI, not yet run on hardware. The Mosquitto/Docker path (`docker-compose.yml`,
+  `make_certs.sh`, `broker_setup.sh`) has not been run either; `make smoke` uses an in-process
+  Python broker instead.
 - One sensor type, one broker, no OTA, no message buffering while offline (readings taken
   while disconnected are lost, which `seq` makes visible).
 - Server-side TLS only. Client certificates would be the next step for per-device identity;
