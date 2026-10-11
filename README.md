@@ -99,11 +99,10 @@ sent by the broker as the last will when the keepalive (30 s) lapses without a c
 | `make test-py` | 7 pytest tests for `tools/subscriber.py` (parsing, nulls, raw payloads, CSV header, `.env`) | yes, passing |
 | `make smoke` | TLS broker (amqtt) → subscriber → CSV, end to end on one machine | yes, passing |
 | `make lint` | `ruff check` + `ruff format --check` | yes, passing |
-| `pio run -e esp32dev` | the firmware compiles | **not in this sandbox** (no package registry access); run by the `firmware-build` job in `.github/workflows/ci.yml` |
+| `pio run -e esp32dev` | the firmware compiles | not in the build sandbox (no package registry access); **passing** in the `firmware-build` job of `.github/workflows/ci.yml` |
 
-`make check` = lint + core tests + Python tests. The firmware was syntax-checked on the host
-against stub headers and its library calls were checked against the current headers of
-PubSubClient, Adafruit_SHT31 and arduino-esp32, but it has not been flashed to a board yet.
+`make check` = lint + core tests + Python tests. The firmware compiles in CI (espressif32 6.x,
+Arduino core 2.0.x) but has not been flashed to a board yet.
 
 ## Layout
 
@@ -121,7 +120,7 @@ tests/                    pytest for the subscriber
 
 ## Limitations
 
-- Not yet run on hardware; the CI firmware build is the only compile check so far.
+- Compiles in CI, not yet run on hardware.
 - One sensor type, one broker, no OTA, no message buffering while offline (readings taken
   while disconnected are lost, which `seq` makes visible).
 - Server-side TLS only. Client certificates would be the next step for per-device identity;

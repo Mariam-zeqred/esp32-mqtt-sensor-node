@@ -58,7 +58,6 @@ flush them in order on reconnect. `seq` already lets the subscriber prove nothin
 
 ## Verified and not verified
 
-Run in the build session: `make check`, `pio test -e native`, `make smoke`. Not run: the
-ESP32 compile and a flash (the sandbox could not reach the PlatformIO registry); the library
-calls were checked against the current library headers and the firmware syntax-checked with
-stubs. First thing on your machine: `pio run -e esp32dev`, or check CI's `firmware-build` job.
+Run in the build session: `make check`, `pio test -e native`, `make smoke`. The ESP32 compile
+(`pio run -e esp32dev`) could not run in the sandbox but passed in CI's `firmware-build` job.
+Not done anywhere yet: flashing a board and watching real readings arrive.
