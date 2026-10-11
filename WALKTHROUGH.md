@@ -9,10 +9,9 @@ how firmware logic should be tested anyway: the JSON builder and the backoff pol
 need an ESP32 to be wrong.
 
 The MQTT details are the point. A retained status topic plus a last will is the standard
-"is the device alive?" pattern, and the broker does the work. The `sleeping` state makes an
-intentional absence look different from a failure. Backoff with jitter is what you need once
-twenty nodes sit behind one router. TLS with your own CA shows that "encrypted" means nothing
-unless the client checks who it is talking to, which is why `MQTT_HOST` must match the
+"is the device alive?" pattern, and the broker does the work. Backoff with jitter is what you
+need once twenty nodes sit behind one router. TLS with your own CA shows that "encrypted" means
+nothing unless the client checks who it is talking to, hence `MQTT_HOST` must match the
 certificate's name.
 
 ## File map
@@ -42,8 +41,8 @@ looks online. That is why `seq` and `uptime_s` are in every document: a consumer
 **2. Why exponential backoff with jitter rather than a fixed 5 s retry?** Fixed retries hammer a
 broker that is restarting and synchronise every node that lost it at the same moment, so the
 TLS handshakes pile up. Doubling spreads the load, the 60 s cap keeps recovery short, and the
-±20 % jitter decorrelates the nodes. `reset()` after success matters too: without it a node up
-for a week would wait a minute after a one-second glitch.
+±20 % jitter decorrelates the nodes. `reset()` after success matters too, or a one-second glitch
+after a week of uptime would cost a minute.
 
 **3. What does TLS protect here, and what does it not?** It protects the readings in transit
 and, since the node checks the broker certificate and hostname against the embedded CA, stops a
