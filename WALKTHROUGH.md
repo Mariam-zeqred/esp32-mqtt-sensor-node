@@ -4,9 +4,8 @@
 
 This is the smallest honest version of "device to cloud": a sensor, a secure transport, a
 broker you control, and a consumer that writes rows you can analyse. Everything that can be
-reasoned about without a board lives in `lib/node_core/` and is tested on the host, which is
-how firmware logic should be tested anyway: the JSON builder and the backoff policy do not
-need an ESP32 to be wrong.
+reasoned about without a board lives in `lib/node_core/` and is tested on the host: the JSON
+builder and the backoff policy do not need an ESP32 to be wrong.
 
 The MQTT details are the point. A retained status topic plus a last will is the standard
 "is the device alive?" pattern, and the broker does the work. Backoff with jitter is what you
@@ -23,7 +22,7 @@ certificate's name.
 - `lib/node_core/Telemetry.cpp` — `snprintf` JSON that refuses to truncate, the SHT31 range
   check, node names from the MAC. `Backoff.cpp` — the retry policy with an injectable random
   source so tests are deterministic.
-- `src/net.cpp` — Wi-Fi and NTP; `wifi_ensure` is non-blocking so the loop keeps running.
+- `src/net.cpp` — Wi-Fi and NTP; `wifi_ensure` only retries when the backoff timer has expired.
 - `src/mqtt_link.cpp` — connect with the will registered, status on connect, clean disconnect
   before deep sleep.
 - `src/sensor.cpp` — the only file that knows it is an SHT31. `src/main.cpp` — the schedule.
@@ -39,8 +38,8 @@ looks online. That is why `seq` and `uptime_s` are in every document: a consumer
 "connected but not publishing", which the status topic cannot show.
 
 **2. Why exponential backoff with jitter rather than a fixed 5 s retry?** Fixed retries hammer a
-broker that is restarting and synchronise every node that lost it at the same moment, so the
-TLS handshakes pile up. Doubling spreads the load, the 60 s cap keeps recovery short, and the
+broker that is restarting and synchronise every node that lost it, so the TLS handshakes pile
+up. Doubling spreads the load, the 60 s cap keeps recovery short, and the
 ±20 % jitter decorrelates the nodes. `reset()` after success matters too, or a one-second glitch
 after a week of uptime would cost a minute.
 
@@ -58,6 +57,6 @@ flush them in order on reconnect. `seq` already lets the subscriber prove nothin
 
 ## Verified and not verified
 
-Run in the build session: `make check`, `pio test -e native`, `make smoke`. The ESP32 compile
-(`pio run -e esp32dev`) could not run in the sandbox but passed in CI's `firmware-build` job.
-Not done anywhere yet: flashing a board and watching real readings arrive.
+Run on the host: `make check`, `make smoke`; CI also runs `pio test -e native` and the ESP32
+compile (`pio run -e esp32dev`). Not done anywhere yet: flashing a board, running the Docker
+broker, and watching real readings arrive.
