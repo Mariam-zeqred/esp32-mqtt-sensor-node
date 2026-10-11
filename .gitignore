@@ -1,0 +1,26 @@
+# secrets
+include/secrets.h
+.env
+docker/passwd
+certs/*.key
+certs/*.srl
+certs/*.csr
+# broker-specific public certs are generated per installation
+certs/*.crt
+
+# build output
+.pio/
+build/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# logged data
+data/
+*.csv
+
+# editors
+.vscode/
+.idea/
+*.swp

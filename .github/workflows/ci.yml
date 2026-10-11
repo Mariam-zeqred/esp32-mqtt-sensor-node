@@ -1,0 +1,22 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  host-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements-dev.txt
+      - run: make check
+      - run: make certs && make smoke
+      - run: pio test -e native
+  firmware-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install platformio
+      - run: cp include/secrets.example.h include/secrets.h && tools/make_certs.sh broker.local
+      - run: pio run -e esp32dev

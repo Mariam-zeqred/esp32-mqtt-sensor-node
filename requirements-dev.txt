@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest>=8
+ruff>=0.6
+amqtt>=0.12   # in-process TLS broker for tools/smoke_test.py
+platformio>=6.1

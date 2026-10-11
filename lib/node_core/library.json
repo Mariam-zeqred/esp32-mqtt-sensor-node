@@ -1,0 +1,7 @@
+{
+  "name": "node_core",
+  "version": "0.1.0",
+  "description": "Hardware-free core of esp32-mqtt-sensor-node: JSON builder, backoff, plausibility checks",
+  "frameworks": "*",
+  "platforms": "*"
+}

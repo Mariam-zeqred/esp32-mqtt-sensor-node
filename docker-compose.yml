@@ -1,0 +1,18 @@
+# Local MQTT broker for the sensor node.
+#   tools/make_certs.sh <this-machine's-LAN-IP-or-hostname>
+#   tools/broker_setup.sh node <passphrase>
+#   docker compose up -d
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: sensor-node-broker
+    restart: unless-stopped
+    ports:
+      - "8883:8883"
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./docker/passwd:/mosquitto/config/passwd:ro
+      - ./certs:/mosquitto/certs:ro
+      - mosquitto-data:/mosquitto/data
+volumes:
+  mosquitto-data:
